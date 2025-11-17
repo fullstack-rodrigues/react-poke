@@ -3,24 +3,43 @@ import lupa from './assets/lupa.png'
 import './App.css';
 import { useState, useEffect } from "react";
 import Card from './components/Card';
+import Modal from './components/Modal';
+import Toast from './components/Toast';
 
 function App() {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const limit = 20;
   const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const [pokemon, setPokemon] = useState(null);
+  const [showError, setShowError] = useState(false);
 
-  async function searchPokemon(name) {
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`);
-    if (!res.ok) return null;
-    return await res.json();
+  const extractIdFromUrl = (url) => {
+    const m = url.match(/\/pokemon\/(\d+)\/?$/);
+    return m ? m[1] : null;
   }
 
-  async function handleSearch() {
-    const result = await searchPokemon(query);
-    // setPokemon(result);
-    console.log(result);
-    
+  async function searchPokemon(name) {
+    try {
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`);
+      if (!res.ok) {
+        setShowError(true);
+        setTimeout(() => setShowError(false), 2500);
+        return null;
+      } 
+      return await res.json();
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async function handleSearch(id) {
+    const result = await searchPokemon(id);
+    if(result) {
+      setPokemon(result);
+      setOpen(true);
+    }
   }
 
   useEffect(() => {
@@ -29,9 +48,13 @@ function App() {
       try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
         const json = await response.json();
-        setData(json?.results);
+        setData(json?.results.map(item => ({
+          ...item,
+          id: extractIdFromUrl(item.url)
+        })));
       } catch (error) {
-        console.error(error);
+       setShowError(true);
+       setTimeout(() => setShowError(false), 2500);
       }
     }
 
@@ -49,17 +72,17 @@ function App() {
           <h1 className='text-[#919191] text-4xl'>Pokédex</h1>
         </div>
         <div className='bg-gray-800 p-5 flex flex-col'>
-          {/* <label className='text-2xl font-montserrat text-white'>Nome ou número</label>
+          <label className='text-2xl font-montserrat text-white'>Nome ou número</label>
           <div className='mt-2 flex '>
             <input className='rounded-md me-2' onChange={(e) => setQuery(e.target.value)} />
             <button className='bg-red-600 p-1 rounded-md'>
-              < img src={lupa} onClick={handleSearch}/>
+              < img src={lupa} onClick={() => handleSearch(query)} />
             </button>
-          </div> */}
+          </div>
         </div>
         <div className='flex flex-wrap justify-center'>
           {
-            data.map((item, index) => <Card pokemon={item} index={index} />)
+            data.map((item, index) => <Card key={index} pokemon={item} onClick={() => handleSearch(item.id)} />)
           }
         </div>
         <div className='flex flex-col md:flex-row justify-center mb-3 items-center mt-4'>
@@ -72,6 +95,13 @@ function App() {
           </button>
         </div>
       </div>
+
+      <Modal open={open} onClose={() => setOpen(false)} pokemon={pokemon} />
+      <Toast
+        type="error"
+        message="Ocorreu um erro ao buscar o Pokémon."
+        visible={showError}
+      />
     </div>
   );
 }
