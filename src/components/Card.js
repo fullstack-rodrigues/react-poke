@@ -12,7 +12,7 @@ function Card({pokemon, index}) {
             <img
                 src={image}
                 alt="Bulbasaur"
-                className="w-40 h-40 object-cover"
+                className="w-60 md:w-40 h-60 md:h-40 object-cover"
             />
             <p className="text-center text-2xl font-montserrat font-bold tracking-wide text-cyan-800">{pokemon?.name}</p>
         </div>
