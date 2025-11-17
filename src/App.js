@@ -5,12 +5,15 @@ import { useState, useEffect } from "react";
 import Card from './components/Card';
 
 function App() {
-   const [data, setData] = useState([]);
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-    useEffect(() => {
+  useEffect(() => {
+    const offset = (page - 1) * limit;
     async function loadPokemon() {
       try {
-        const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
         const json = await response.json();
         setData(json?.results);
       } catch (error) {
@@ -19,7 +22,7 @@ function App() {
     }
 
     loadPokemon();
-  }, []);
+  }, [page]);
 
   return (
     <div className='flex flex-col items-center bg-[#2b2b2b] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.03)_0px,rgba(255,255,255,0.03)_40px,transparent_40px,transparent_110px)]
@@ -28,22 +31,31 @@ function App() {
       bg-blend-normal'>
       <div className='w-[70%] bg-white'>
         <div className='flex items-center justify-center p-2'>
-          <img src={pokebola} title='pokebola' className='w-20 h-20'/>
+          <img src={pokebola} title='pokebola' className='w-20 h-20' />
           <h1 className='text-[#919191] text-4xl'>Pokédex</h1>
         </div>
         <div className='bg-gray-800 p-5 flex flex-col'>
           <label className='text-2xl font-montserrat text-white'>Nome ou número</label>
           <div className='mt-2 flex '>
-            <input className='rounded-md me-2'/> 
+            <input className='rounded-md me-2' />
             <button className='bg-red-600 p-1 rounded-md'>
-              < img src={lupa}/>
+              < img src={lupa} />
             </button>
           </div>
         </div>
         <div className='flex flex-wrap justify-center'>
           {
-            data.map((item, index) => <Card pokemon={item} index={index}/>)
+            data.map((item, index) => <Card pokemon={item} index={index} />)
           }
+        </div>
+        <div className='flex justify-center mb-3 items-center'>
+          <button onClick={() => setPage((p) => p - 1)} disabled={page === 1} className='px-4 py-1 bg-gray-800 text-white rounded-md disabled:bg-gray-400'>
+            Página anterior
+          </button>
+            <p className='mx-2'>Página Atual: {page}</p>
+          <button onClick={() => setPage((p) => p + 1)} className='px-4 py-1 bg-gray-800 text-white rounded-md'>
+            Próxima página
+          </button>
         </div>
       </div>
     </div>

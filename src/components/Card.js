@@ -1,5 +1,10 @@
 function Card({pokemon, index}) {
-    const id = index + 1;
+    const extractIdFromUrl = (url) => {
+    const m = url.match(/\/pokemon\/(\d+)\/?$/);
+    return m ? m[1] : null;
+  };
+
+    const id = extractIdFromUrl(pokemon.url);
     const image = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
     return (
         <div className="flex-col items-center shadow-lg m-2 rounded-lg p-2 cursor-pointer
