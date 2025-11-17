@@ -1,4 +1,5 @@
 import { typeColors } from "../utils/colors";
+import StatsChart from "./StatsChart";
 
 export default function Modal({ open, onClose, pokemon }) {
   if (!open || !pokemon) return null;
@@ -9,6 +10,7 @@ export default function Modal({ open, onClose, pokemon }) {
       <div className="absolute inset-0" onClick={onClose} />
 
       <div className="relative bg-white p-6 rounded-xl shadow-xl w-96 animate-fade-in">
+        <div className="flex justify-end font-bold text-cyan-800">#{pokemon.id}</div>
         <div className="flex flex-col items-center">
           <p className="font-montserrat text-2xl font-bold tracking-wide text-cyan-800">{pokemon.name}</p>
           <img
@@ -23,6 +25,9 @@ export default function Modal({ open, onClose, pokemon }) {
               <p className={`${typeColors[item.type?.name]} text-white px-3 rounded-lg mx-2`}>{item.type?.name}</p>
             ))
           }
+          </div>
+          <div className="mt-3">
+            <StatsChart stats={pokemon.stats} />
           </div>
         </div>
         

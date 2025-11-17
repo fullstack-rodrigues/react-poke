@@ -27,7 +27,7 @@ function App() {
         setShowError(true);
         setTimeout(() => setShowError(false), 2500);
         return null;
-      } 
+      }
       return await res.json();
     } catch (error) {
       console.error(error)
@@ -36,7 +36,8 @@ function App() {
 
   async function handleSearch(id) {
     const result = await searchPokemon(id);
-    if(result) {
+    if (result) {
+      setQuery('');
       setPokemon(result);
       setOpen(true);
     }
@@ -53,8 +54,8 @@ function App() {
           id: extractIdFromUrl(item.url)
         })));
       } catch (error) {
-       setShowError(true);
-       setTimeout(() => setShowError(false), 2500);
+        setShowError(true);
+        setTimeout(() => setShowError(false), 2500);
       }
     }
 
@@ -71,28 +72,52 @@ function App() {
           <img src={pokebola} title='pokebola' className='w-20 h-20' />
           <h1 className='text-[#919191] text-4xl'>Pokédex</h1>
         </div>
-        <div className='bg-gray-800 p-5 flex flex-col'>
+        <div className='bg-gray-800 p-5 flex flex-col items-center md:items-start'>
           <label className='text-2xl font-montserrat text-white'>Nome ou número</label>
           <div className='mt-2 flex '>
-            <input className='rounded-md me-2' onChange={(e) => setQuery(e.target.value)} />
-            <button className='bg-red-600 p-1 rounded-md'>
+            <input className='rounded-md me-2' value={query} onChange={(e) => setQuery(e.target.value)} />
+            <button className='bg-red-600 p-1 rounded-md' disabled={!query}>
               < img src={lupa} onClick={() => handleSearch(query)} />
             </button>
           </div>
         </div>
-        <div className='flex flex-wrap justify-center'>
-          {
-            data.map((item, index) => <Card key={index} pokemon={item} onClick={() => handleSearch(item.id)} />)
-          }
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-6">
+          <button
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page === 1}
+            className="
+              px-4 py-2 rounded-lg font-medium
+              bg-gray-900 text-white 
+              hover:bg-gray-700 transition
+              disabled:bg-gray-400 disabled:cursor-not-allowed
+              shadow-md 
+            "
+          >
+            ◀ Página anterior
+          </button>
+
+          <span className="px-4 py-2 bg-gray-200 rounded-lg shadow text-gray-800 font-semibold">
+            Página {page}
+          </span>
+
+          <button
+            onClick={() => setPage((p) => p + 1)}
+            disabled={page === 64}
+            className="
+              px-4 py-2 rounded-lg font-medium
+              bg-gray-900 text-white 
+              hover:bg-gray-700 transition
+              disabled:bg-gray-400 disabled:cursor-not-allowed
+              shadow-md
+            "
+          >
+            Próxima página ▶
+          </button>
         </div>
-        <div className='flex flex-col md:flex-row justify-center mb-3 items-center mt-4'>
-          <button onClick={() => setPage((p) => p - 1)} disabled={page === 1} className='px-4 py-1 bg-gray-800 text-white rounded-md disabled:bg-gray-400'>
-            Página anterior
-          </button>
-          <p className='m-3'>Página Atual: {page}</p>
-          <button onClick={() => setPage((p) => p + 1)} className='px-4 py-1 bg-gray-800 text-white rounded-md'>
-            Próxima página
-          </button>
+        <div className='flex flex-wrap justify-center my-3'>
+          {
+            data.map((item, index) => <Card key={index} pokemon={item} onClick={() => handleSearch(item.id)}  />)
+          }
         </div>
       </div>
 
